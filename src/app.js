@@ -15,13 +15,9 @@ async function calculateRate(from, to, fee) {
 
     if (from === currencies.EUR) {
         const toRate = await Currency.findOne({name: to});
-        console.log(toRate);
         originalRate = toRate.price;
-        console.log('originalRate = ' + originalRate);
-        feeAmount = originalRate * (1 / fee);
-        console.log('feeAmount = ' + feeAmount);
+        feeAmount = fee > 0? originalRate * (1 / fee) : 0;
         rateWithFee = originalRate + feeAmount;
-        console.log('rateWithFee = ' + rateWithFee);
         res = {
             "Pair" : from + '-' + to,
             "Original Rate" : originalRate,
@@ -33,7 +29,7 @@ async function calculateRate(from, to, fee) {
     return res;
 }
 
-async function updateRates() {
+async function updatePrices() {
     http.get('http://data.fixer.io/api/latest?access_key=' + API_KEY, (resp) => {
         let data = '';
 
@@ -67,9 +63,12 @@ const init = async () => {
         method: 'GET',
         path: '/rates',
         handler: async (request, h) => {
-            await updateRates();
+            // Update DB prices before calculate FX rates
+            await updatePrices();
             let result = [];
+            // Gets existing rates from DB
             const rates = await Rate.find();
+            // calculate response for each rate based on updated prices.
             for (const rate of rates) {
                 const fxRate = await calculateRate(rate.from, rate.to, rate.feePercentage);
                 console.log('fxRate = ' + fxRate);
