@@ -1,41 +1,40 @@
 const Hapi = require('@hapi/hapi');
 const http = require('http');
 require('./database');
-const Rate = require('./models/Rate')
+const Rate = require('./models/Rate');
+const Currency = require('./models/Currency');
+const currencies = require('./currencies');
 
 const API_KEY = "ffcc344a3f31700c0020d166fd17ea96";
 
 async function calculateRate(from, to, fee) {
-    const ratesList = await getFxRates();
-
+    var res = {};
     let originalRate;
     let feeAmount;
     let rateWithFee;
 
-    if (from === 'EUR') {
-        originalRate = ratesList[to];
+    if (from === currencies.EUR) {
+        const toRate = await Currency.findOne({name: to});
+        console.log(toRate);
+        originalRate = toRate.price;
+        console.log('originalRate = ' + originalRate);
         feeAmount = originalRate * (1 / fee);
+        console.log('feeAmount = ' + feeAmount);
         rateWithFee = originalRate + feeAmount;
-    } else {
-
+        console.log('rateWithFee = ' + rateWithFee);
+        res = {
+            "Pair" : from + '-' + to,
+            "Original Rate" : originalRate,
+            "Fee %" : fee,
+            "Fee Amount" : feeAmount,
+            "Rate with fee applied" : rateWithFee
+        }
     }
-    /*Object.keys(ratesList).forEach(async function(key) {
-        const query = {rate: key},
-            update = {price: ratesList[key]},
-            options = { upsert: true, new: true, setDefaultsOnInsert: true };
-        await Rate.findOneAndUpdate(query, update, options);
-    }); */
-    return {
-        "Pair" : from+to,
-        "Original Rate" : originalRate,
-        "Fee %" : fee,
-        "Fee Amount" : feeAmount,
-        "Rate with fee applied" : rateWithFee
-    }
+    return res;
 }
 
-async function getFxRates() {
-    await http.get('http://data.fixer.io/api/latest?access_key=' + API_KEY, (resp) => {
+async function updateRates() {
+    http.get('http://data.fixer.io/api/latest?access_key=' + API_KEY, (resp) => {
         let data = '';
 
         // A chunk of data has been received.
@@ -45,12 +44,16 @@ async function getFxRates() {
 
         // The whole response has been received. Print out the result.
         resp.on('end',  () => {
-            return JSON.parse(data).rates;
+            const ratesList = JSON.parse(data).rates;
+            Object.keys(ratesList).forEach(async function(key) {
+                const query = {name: key},
+                    update = {price: ratesList[key]},
+                    options = { upsert: true, new: true, setDefaultsOnInsert: true };
+                await Currency.findOneAndUpdate(query, update, options);
+            });
         });
-
     }).on("error", (err) => {
         console.log("Error: " + err.message);
-
     });
 }
 
@@ -64,12 +67,12 @@ const init = async () => {
         method: 'GET',
         path: '/rates',
         handler: async (request, h) => {
+            await updateRates();
             let result = [];
             const rates = await Rate.find();
-            for (const rate of Object.keys(rates)) {
-                console.log('rate = ' + rate );
+            for (const rate of rates) {
                 const fxRate = await calculateRate(rate.from, rate.to, rate.feePercentage);
-                console.log('fxRate = ' + JSON.stringify(fxRate));
+                console.log('fxRate = ' + fxRate);
                 result.push(fxRate);
             }
             return h.response(result);
