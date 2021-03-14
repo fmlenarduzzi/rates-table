@@ -15,22 +15,28 @@ async function calculateRate(from, to, fee) {
 
     if (from === currencies.EUR) {
         const toRate = await Currency.findOne({name: to});
+        console.log('toRate = ' + toRate);
         originalRate = toRate.price;
-        feeAmount = fee > 0? originalRate * (1 / fee) : 0;
-        rateWithFee = originalRate + feeAmount;
-        res = {
-            "Pair" : from + '-' + to,
-            "Original Rate" : originalRate,
-            "Fee %" : fee,
-            "Fee Amount" : feeAmount,
-            "Rate with fee applied" : rateWithFee
-        }
+    } else {
+        const fromPrice = await Currency.findOne({name: from});
+        const toPrice = await Currency.findOne({name: to});
+        originalRate = toPrice.price / fromPrice.price;
+    }
+
+    feeAmount = fee > 0? originalRate * (1 / fee) : 0;
+    rateWithFee = originalRate + feeAmount;
+    res = {
+        "Pair" : from + '-' + to,
+        "Original Rate" : originalRate,
+        "Fee %" : fee,
+        "Fee Amount" : feeAmount,
+        "Rate with fee applied" : rateWithFee
     }
     return res;
 }
 
 async function updatePrices() {
-    http.get('http://data.fixer.io/api/latest?access_key=' + API_KEY, (resp) => {
+    await http.get('http://data.fixer.io/api/latest?access_key=' + API_KEY, (resp) => {
         let data = '';
 
         // A chunk of data has been received.
@@ -71,7 +77,6 @@ const init = async () => {
             // calculate response for each rate based on updated prices.
             for (const rate of rates) {
                 const fxRate = await calculateRate(rate.from, rate.to, rate.feePercentage);
-                console.log('fxRate = ' + fxRate);
                 result.push(fxRate);
             }
             return h.response(result);
@@ -111,6 +116,8 @@ const init = async () => {
     }) // end of server.route
 
     await server.start();
+    // Update DB prices before calculate FX rates
+    await updatePrices();
     console.log('Server running on %s', server.info.uri);
 };
 
