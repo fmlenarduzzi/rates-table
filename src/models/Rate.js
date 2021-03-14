@@ -13,9 +13,9 @@ const rateSchema = new Schema({
     },
     feePercentage: {
         type: Number,
-        default: '0',
+        required: false,
     },
-}, { timestamps: true })
+})
 
 rateSchema.index({ from: 1, to: 1 }, {
     unique: true,

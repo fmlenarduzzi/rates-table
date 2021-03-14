@@ -20,9 +20,12 @@
   "dependencies": {
     "@hapi/hapi": "^20.1.0",
     "@hapi/joi": "^17.1.1",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.3.2",
     "mongoose": "^5.11.19"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
     "nodemon": "^2.0.7"
   }
 }
