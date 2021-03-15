@@ -1,15 +1,13 @@
 # Rates App
-## _API provider for FX rates._
-
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
-
+## _API provider for FX rates._  
+  
 Small app that allows a user to see a table of rates and create new ones by obtaining FX rates from an API.
 This app uses two MongoDB collections:
 - Rates: Stores currency pairs created by user.
 - Currency: Stores all available FX rates obtained from provided API. Currency base is EUR.
 
 ## Features
-###GET /prices  
+### GET /prices  
 Description: Get all currency FX rates  
 Response [200 OK]:  
 ```json
@@ -39,7 +37,7 @@ Response [200 OK]:
       }]
 ```    
 
-###POST /rates  
+### POST /rates  
 Description: Creates new FX rate pair  
 Body:  
 ```json
