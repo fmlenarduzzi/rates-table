@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "082be4f4-19f6-4d9d-8d70-ba2e4998bac4",
+		"name": "rates-table",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create rate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"from\": \"EUR\",\n   \"to\" : \"USD\",\n   \"feePercentage\": 10 \n}"
+				},
+				"url": {
+					"raw": "localhost:3000/rates",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create rate without fee",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"from\": \"EUR\",\n   \"to\" : \"BRL\"\n}"
+				},
+				"url": {
+					"raw": "localhost:3000/rates",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create rate for non-direct conversion",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"from\": \"USD\",\n   \"to\" : \"ARS\",\n   \"feePercentage\": 50 \n}"
+				},
+				"url": {
+					"raw": "localhost:3000/rates",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create invalid rate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"from\": \"AAA\",\n   \"to\" : \"USD\",\n   \"feePercentage\": 10 \n}"
+				},
+				"url": {
+					"raw": "localhost:3000/rates",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "rates",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/rates",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRateByName",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/rates/EUR/USD",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates",
+						"EUR",
+						"USD"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "prices",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/rates",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"rates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllRatesFromAPI",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://data.fixer.io/api/latest?access_key=ffcc344a3f31700c0020d166fd17ea96",
+					"protocol": "http",
+					"host": [
+						"data",
+						"fixer",
+						"io"
+					],
+					"path": [
+						"api",
+						"latest"
+					],
+					"query": [
+						{
+							"key": "access_key",
+							"value": "ffcc344a3f31700c0020d166fd17ea96"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
