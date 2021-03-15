@@ -15,7 +15,6 @@ async function calculateRate(rate) {
 
     if (rate.from === currencies.EUR) {
         const toRate = await Currency.findOne({name: rate.to});
-        console.log('toRate = ' + toRate);
         originalRate = toRate.price;
     } else {
         const fromPrice = await Currency.findOne({name: rate.from});
@@ -23,16 +22,18 @@ async function calculateRate(rate) {
         originalRate = toPrice.price / fromPrice.price;
     }
 
-    if (rate.fee) {
-        feeAmount = rate.fee > 0 ? originalRate * (1 / rate.fee) : 0;
+    if (rate.feePercentage) {
+        feeAmount = rate.feePercentage > 0 ? originalRate * (1 / rate.feePercentage) : 0;
+    } else {
+        feeAmount = 0;
     }
     rateWithFee = originalRate + feeAmount;
     res = {
         "Pair" : rate.from + '-' + rate.to,
         "Original Rate" : originalRate,
-        "Fee %" : rate.fee? rate.fee : 0,
+        "Fee %" : rate.feePercentage? rate.feePercentage : 0,
         "Fee Amount" : feeAmount,
-        "Rate with fee applied" : rateWithFee
+        "Rate with fee applied" : rateWithFee,
     }
     return res;
 }

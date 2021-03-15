@@ -131,13 +131,123 @@ describe('Test Rates API ',()=>{
                 .get('/prices')
                 .end(   async function(err,res){
                     expect(res.body.length).to.equals(168);
+                    res.body.result.forEach ((item) => {
+                        expect(item).to.have.property('name');
+                        expect(item).to.have.property('price');
+                    });
+                });
+        });
+
+        it('should get all created rates',  async () => {
+            await Rate.remove({});
+
+            // Adds three rates
+            chai.request(url)
+                .post('/rates')
+                .send({
+                    from: "EUR",
+                    to: "USD",
+                    feePercentage: 10
+                })
+                .end(function (err, res) {});
+
+            chai.request(url)
+                .post('/rates')
+                .send({
+                    from: "USD",
+                    to: "ARS",
+                    feePercentage: 50
+                })
+                .end(function (err, res) {});
+
+            chai.request(url)
+                .post('/rates')
+                .send({
+                    from: "USD",
+                    to: "BRL"
+                })
+                .end(function (err, res) {});
+
+            chai.request(url)
+                .get('/rates')
+                .end(   async function(err,res){
+                    expect(res.body.length).to.equals(3);
+                    res.body.result.forEach ((item) => {
+                        expect(item).to.have.property('Pair');
+                        expect(item).to.have.property('Original Rate');
+                        expect(item).to.have.property('Fee %');
+                        expect(item).to.have.property('Rate with fee applied');
+                    });
+                });
+        });
+
+        it('should get all correct fields',  async () => {
+            await Rate.remove({});
+
+            // Adds one rate
+            chai.request(url)
+                .post('/rates')
+                .send({
+                    from: "EUR",
+                    to: "USD",
+                    feePercentage: 10,
+                })
+                .end(function (err, res) {});
+
+            // Checks rate calculation
+            chai.request(url)
+                .get('/rates')
+                .end(   async function(err,res){
+                    const rate = res.body[0];
+                    const originalRate = rate['Original Rate'];
+                    const feeAmount = rate['Fee Amount'];
+                    console.log(rate);
+                    expect(res.body.length).to.equals(1);
+                    expect(rate.Pair).to.equals('EUR-USD');
+                    expect(rate).to.have.property('Original Rate');
+                    expect(rate['Fee %']).to.equals('10');
+                    expect(rate).to.have.property('Fee Amount');
+                    expect(rate['Fee Amount']).to.equals(feeAmount);
+                    expect(rate).to.have.property('Rate with fee applied');
+                    expect(rate['Rate with fee applied']).to.equals(originalRate + feeAmount);
+                });
+        });
+
+        it('should get all correct fields',  async () => {
+            await Rate.remove({});
+
+            // Adds one rate
+            chai.request(url)
+                .post('/rates')
+                .send({
+                    from: "EUR",
+                    to: "USD",
+                    feePercentage: 10,
+                })
+                .end(function (err, res) {});
+
+            // Checks rate calculation
+            chai.request(url)
+                .get('/rates/EUR/USD')
+                .end(   async function(err,res){
+                    const rate = res.body[0];
+                    const originalRate = rate['Original Rate'];
+                    const feeAmount = rate['Fee Amount'];
+                    console.log(rate);
+                    expect(res.body.length).to.equals(1);
+                    expect(rate.Pair).to.equals('EUR-USD');
+                    expect(rate).to.have.property('Original Rate');
+                    expect(rate['Fee %']).to.equals('10');
+                    expect(rate).to.have.property('Fee Amount');
+                    expect(rate['Fee Amount']).to.equals(feeAmount);
+                    expect(rate).to.have.property('Rate with fee applied');
+                    expect(rate['Rate with fee applied']).to.equals(originalRate + feeAmount);
                 });
         });
     });
 });
 
-
-// DB Escenarios
+// DB Scenarios
 
 describe('Test DB Operations ',async ()=>{
 
