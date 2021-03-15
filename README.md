@@ -1,12 +1,17 @@
 # Rates App
 ## _API provider for FX rates._  
   
-Small app that allows a user to see a table of rates and create new ones by obtaining FX rates from an API.
+Small app that allows a user to see a table of rates and create new ones by obtaining FX rates from an API.  
+  
+## High Level Design  
 This app uses two MongoDB collections:
 - Rates: Stores currency pairs created by user.
-- Currency: Stores all available FX rates obtained from provided API. Currency base is EUR.
+- Currency: Stores all available FX rates obtained from provided API. Currency base is EUR.  
+  
+![](Images/RatesTable.png)
+  
 
-## Features
+## API Documentation
 ### GET /prices  
 Description: Get all currency FX rates  
 Response [200 OK]:  
